@@ -41,6 +41,41 @@ app.post('/send-message', async (req, res) => {
     }
 })
 
+const sendMessage = async (userId, message) => {
+    try {
+        const body = {
+            to: userId,
+            message: [
+                {
+                    type: 'text',
+                    text: message
+                }
+            ]
+        }
+        const response = await axios.post(
+            `${LINE_BOT_API}/message/push`, body, { headers }
+        )
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+app.post('/webhook', async (req, res) => {
+    const { events } = req.body
+    console.log("req.body", req.body)
+    if (!events || events.length === 0) {
+        res.json({
+            message: 'ok'
+        })
+        return false
+    }
+    console.log('events', events)
+    const lineEvent = events[0]
+    const userId = lineEvent.source.userId
+    const response = await sendMessage(userId, 'hello from webhook')
+})
+
+
 app.listen(PORT, (req, res) => {
     console.log(`run at http://localhost:${PORT}`)
 })
