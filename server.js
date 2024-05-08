@@ -72,7 +72,18 @@ app.post('/webhook', async (req, res) => {
     console.log('events', events)
     const lineEvent = events[0]
     const userId = lineEvent.source.userId
-    const response = await sendMessage(userId, 'hello from webhook')
+
+    const body = {
+        to: userId,
+        messages: [
+            {
+                type: "text",
+                text: "hello from webhook"
+            }
+        ]
+    }
+
+    const response = await axios.post(`${LINE_BOT_API}/message/push`, body, { headers })
 })
 
 
